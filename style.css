@@ -2105,15 +2105,128 @@ input:focus-visible,
   letter-spacing: 0.02em;
 }
 
-/* ---------- Preview showcase cards (landing) ---------- */
-.showcase-card {
-  padding: 22px 18px;
-  text-align: center;
-  transition: transform var(--transition), box-shadow var(--transition);
+/* ---------- Preview showcase: demo carousel (screenshot asli produk) ----------
+   Mobile-first: base = horizontal scroll-snap carousel (hp & tablet kecil).
+   >=640px = 2 kartu per baris (tablet). >=1024px = grid 4 kolom (desktop). */
+.demo-scroll-wrap {
+  position: relative;
 }
-.showcase-card:hover {
-  transform: translateY(-4px);
+
+.demo-scroller {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 20px 6px;
+  margin: 0 -20px;
 }
+.demo-scroller::-webkit-scrollbar { display: none; }
+
+.demo-card {
+  flex: 0 0 76%;
+  scroll-snap-align: center;
+  background: white;
+  border: 1px solid var(--slate-100);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  margin: 0;
+}
+
+.demo-card-media {
+  aspect-ratio: 700 / 545;
+  overflow: hidden;
+  background: var(--slate-50);
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.demo-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.demo-card-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px 16px;
+}
+
+.demo-card-body strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--slate-800);
+  letter-spacing: -0.005em;
+  margin-bottom: 2px;
+}
+
+.demo-card-body span {
+  font-size: 0.78rem;
+  color: var(--slate-500);
+  line-height: 1.5;
+}
+
+.demo-card-body .lucide {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Fade hint di tepi kanan carousel, menandakan masih ada kartu berikutnya */
+.demo-scroll-fade {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  bottom: 6px;
+  width: 36px;
+  background: linear-gradient(90deg, rgba(250,248,244,0) 0%, var(--slate-50) 85%);
+  pointer-events: none;
+}
+
+.demo-scroll-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 0.76rem;
+  color: var(--slate-400);
+}
+
+@media (min-width: 640px) {
+  .demo-card { flex-basis: 44%; }
+  .demo-card-body strong { font-size: 0.95rem; }
+}
+
+@media (min-width: 1024px) {
+  .demo-scroll-wrap { max-width: 1080px; margin: 0 auto; }
+  .demo-scroller {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+    padding: 4px 0 6px;
+    margin: 0;
+  }
+  .demo-card { scroll-snap-align: none; }
+  .demo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--emerald-100);
+  }
+  .demo-scroll-fade,
+  .demo-scroll-hint { display: none; }
+}
+
+.reveal-stagger.in-view > *:nth-child(5) { animation-delay: 0.33s; }
+.reveal-stagger.in-view > *:nth-child(6) { animation-delay: 0.38s; }
+.reveal-stagger.in-view > *:nth-child(7) { animation-delay: 0.43s; }
+.reveal-stagger.in-view > *:nth-child(8) { animation-delay: 0.48s; }
 
 /* ---------- Footer Legal Links ---------- */
 .footer-links {
