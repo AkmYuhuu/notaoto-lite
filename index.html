@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="NotaOTO LITE - Bikin Nota Digital Premium & Kirim ke WhatsApp Pelanggan dalam 1 Menit. Tanpa Ribet Akuntansi!">
+  <meta name="theme-color" content="#0e7a54">
+
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Catatan: Tailwind CDN sudah dihapus — dicek dan ternyata tidak ada satu
+       pun utility class Tailwind yang dipakai di halaman ini (semua styling
+       pakai class custom di style.css), jadi script ini cuma beban loading
+       tanpa manfaat sama sekali. -->
+  <!-- Lucide Icons (premium SVG icons) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- html-to-image untuk export gambar (ganti html2canvas — jauh lebih akurat
+       untuk SVG icon, gradient, custom font, dan border-dotted, sehingga hasil
+       generate sama persis dengan Live Preview) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <title>NotaOTO LITE - Nota Digital Premium untuk UMKM</title>
+
+  <!-- PWA / Offline hint -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230e7a54'/%3E%3Cpath d='M35 55l10 10 20-20' fill='none' stroke='%23ecd8a4' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <style>
+    /* Tailwind overrides for our custom design system */
+    .container { max-width: 1200px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       TOAST CONTAINER
+       ============================================ -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ============================================
+       MODAL OVERLAY
+       ============================================ -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <h3 id="modal-title">Konfirmasi</h3>
+      <p id="modal-message">Apakah Anda yakin?</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="modal-cancel" class="btn-secondary" style="display:none">Batal</button>
+        <button id="modal-confirm" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       PAGE: LANDING PAGE
+       ============================================ -->
+  <div id="landing-page" class="page active">
+
+    <!-- HERO SECTION -->
+    <section class="landing-hero">
+      <div class="grain"></div>
+
+      <!-- Monogram Seal -->
+      <div class="brand-seal" style="margin-bottom:18px">N</div>
+
+      <!-- Badge -->
+      <div class="hero-badge">
+        <i data-lucide="sparkles" class="lucide" style="width:14px;height:14px;color:#ecd8a4"></i>
+        <span>UMKM Indonesia - Premium Tanpa Ribet</span>
+      </div>
+
+      <!-- Title -->
+      <h1 class="hero-title">
+        NotaOTO <span class="highlight">LITE</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-subtitle">
+        Bikin Nota Digital Premium &amp; Kirim ke WhatsApp Pelanggan dalam 1 Menit.<br>
+        <strong>Tanpa Ribet Akuntansi!</strong>
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="hero-actions">
+        <a href="#features" class="btn-primary btn-hero-secondary">
+          <i data-lucide="eye" class="lucide" style="width:16px;height:16px"></i> Lihat Fitur
+        </a>
+        <a href="#activate" class="btn-primary">
+          <i data-lucide="rocket" class="lucide" style="width:16px;height:16px"></i> Mulai Sekarang
+        </a>
+      </div>
+
+      <!-- Trust strip -->
+      <div class="trust-strip">
+        <span><i data-lucide="shield-check" class="lucide" style="width:13px;height:13px"></i> Tanpa Aplikasi</span>
+        <span><i data-lucide="zap" class="lucide" style="width:13px;height:13px"></i> Langsung Jadi</span>
+        <span><i data-lucide="lock" class="lucide" style="width:13px;height:13px"></i> Data Aman di HP-mu</span>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="hero-scroll-indicator">
+        <span>Scroll</span>
+        <i data-lucide="chevron-down" class="lucide" style="width:18px;height:18px"></i>
+      </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features" class="section-padding reveal" style="background:white">
+      <h2 class="section-title">Kenapa NotaOTO LITE?</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">
+        Ganti nota kertas dan chat WA manual dengan nota digital instan yang bikin toko Anda terlihat profesional.
+      </p>
+
+      <div class="feature-grid reveal-stagger">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="send" class="lucide" style="width:22px;height:22px;color:var(--primary)"></i></div>
+          <div class="feature-text">
+            <h4>1-Klik Kirim WhatsApp</h4>
+            <p>Nota langsung jadi & siap kirim ke nomor pelanggan tanpa perlu simpan kontak dulu.</p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="palette" class="lucide" style="width:22px;height:22px;color:var(--primary)"></i></div>
+          <div class="feature-text">
+            <h4>Live Design Preview</h4>
+            <p>Ganti warna tema sesuai logo tokomu & lihat hasilnya langsung secara real-time.</p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="zap" class="lucide" style="width:22px;height:22px;color:var(--primary)"></i></div>
+          <div class="feature-text">
+            <h4>Bebas Lemot &amp; Bebas Iklan</h4>
+            <p>Web super ringan tanpa database berat, bebas iklan mengganggu kenyamanan jualan.</p>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="smartphone" class="lucide" style="width:22px;height:22px;color:var(--primary)"></i></div>
+          <div class="feature-text">
+            <h4>Siap QRIS Bisnis</h4>
+            <p>Kolom khusus untuk tempel QRIS toko agar pelanggan bisa langsung bayar dari nota digital.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVIEW SHOWCASE -->
+    <section class="section-padding reveal" style="background:var(--slate-50)">
+      <h2 class="section-title">8 Layout Premium</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">
+        Pilih gaya nota yang cocok dengan brand toko Anda, kombinasikan dengan 10 pilihan warna tema.
+      </p>
+
+      <div class="reveal-stagger" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:900px;margin:0 auto">
+        <div class="glass-card showcase-card">
+          <i data-lucide="file-text" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Minimalis</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Bersih, profesional, dan elegan</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="receipt" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Struk Kasir</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Classic retro dengan font monospace</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="sparkles" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Olshop Estetik</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Header warna-warni, modern & catchy</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="gem" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Elegan Emas</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Mewah dengan aksen bingkai emas</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="book-open" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Klasik Toko</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Nota bon tradisional yang formal</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="layout-panel-top" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Kartu Modern</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Gaya kartu dengan aksen warna cerah</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="flower-2" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Boho Pastel</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Lembut, hangat, dan dekoratif</p>
+        </div>
+        <div class="glass-card showcase-card">
+          <i data-lucide="briefcase" class="lucide" style="width:32px;height:32px;color:var(--primary);margin-bottom:8px"></i>
+          <h4 style="font-weight:600;font-size:0.95rem">Korporat</h4>
+          <p style="font-size:0.8rem;color:var(--slate-500)">Gaya invoice bisnis yang profesional</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVATION / CTA SECTION -->
+    <section id="activate" class="section-padding reveal" style="background:white">
+      <h2 class="section-title">Mulai Sekarang</h2>
+      <div class="section-divider"></div>
+      <p class="section-subtitle">
+        Masukkan kode akses premium yang sudah dibeli untuk mengaktifkan fitur lengkap.
+      </p>
+
+      <div class="activation-box" style="position:relative">
+
+        <!-- FORM AKTIVASI -->
+        <div id="activation-form-wrapper">
+          <h3><i data-lucide="key" class="lucide" style="width:20px;height:20px;color:var(--amber-500);vertical-align:-0.15em"></i> Aktivasi Premium</h3>
+          <p>Masukkan kode akses yang Anda dapatkan dari admin</p>
+
+          <form id="activation-form">
+            <div class="code-input-group">
+              <input
+                type="text"
+                id="code-input"
+                class="form-input"
+                placeholder="Masukkan kode akses"
+                autocomplete="off"
+                maxlength="20"
+                style="text-transform:uppercase"
+              >
+            </div>
+
+            <div id="activation-error" style="display:none;color:#dc2626;font-size:0.8rem;margin-bottom:12px;text-align:center"></div>
+
+            <button type="submit" id="verify-btn" class="btn-primary btn-block btn-generate">
+              <span id="verify-spinner" class="spinner" style="display:none"></span>
+              <i data-lucide="unlock" class="lucide" style="width:16px;height:16px;display:none" id="verify-icon"></i>
+              <span id="verify-text">Aktifkan Premium</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- STATUS PREMIUM AKTIF -->
+        <div id="activation-status" style="display:none">
+          <h3 style="font-family:var(--font-display)"><i data-lucide="check-circle" class="lucide" style="width:20px;height:20px;color:var(--emerald-500);vertical-align:-0.15em"></i> Premium Aktif</h3>
+          <p style="margin-bottom:16px">Akun premium Anda sedang aktif. Silakan masuk ke dashboard.</p>
+
+          <div style="background:var(--emerald-50);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+            <div style="font-size:0.78rem;color:var(--slate-500);margin-bottom:4px"><i data-lucide="store" class="lucide" style="width:14px;height:14px;color:var(--slate-400);vertical-align:-0.1em"></i> <span id="activation-status-name">Toko</span></div>
+            <div style="font-size:0.82rem;color:var(--slate-700);font-weight:500"><i data-lucide="clock" class="lucide" style="width:14px;height:14px;color:var(--slate-400);vertical-align:-0.1em"></i> Aktif hingga: <strong id="activation-status-expiry">-</strong></div>
+          </div>
+
+          <button type="button" id="go-to-dashboard-btn" class="btn-primary btn-block btn-generate">
+            <span id="go-to-dashboard-spinner" class="spinner" style="display:none"></span>
+            <i data-lucide="layout-dashboard" class="lucide" style="width:16px;height:16px;display:none" id="dashboard-icon"></i>
+            <span id="go-to-dashboard-text">Pergi ke Dashboard</span>
+          </button>
+
+          <div id="expired-info" style="display:none;margin-top:12px">
+            <div style="background:#fef2f2;border-radius:12px;padding:16px;text-align:center;margin-bottom:12px">
+              <div style="font-size:0.85rem;color:#dc2626;font-weight:500"><i data-lucide="alert-triangle" class="lucide" style="width:16px;height:16px;color:#dc2626;vertical-align:-0.15em"></i> Masa aktif premium Anda telah habis</div>
+              <div style="font-size:0.78rem;color:var(--slate-500);margin-top:4px">Silakan perpanjang dengan membeli kode akses baru.</div>
+            </div>
+            <button type="button" id="reactivate-btn" class="btn-primary btn-gold btn-block">
+              <i data-lucide="refresh-cw" class="lucide" style="width:16px;height:16px"></i> Aktifkan Premium Lagi
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--slate-100);text-align:center">
+          <p style="font-size:0.82rem;color:var(--slate-500);margin-bottom:12px">
+            Belum punya kode akses?
+          </p>
+          <button id="buy-btn" class="btn-primary btn-gold">
+            <i data-lucide="message-circle" class="lucide" style="width:16px;height:16px"></i> Hubungi Admin & Beli (Mulai Rp 15.000)
+          </button>
+
+          <div style="margin-top:16px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+            <span class="price-tag"><i data-lucide="calendar" class="lucide" style="width:14px;height:14px;vertical-align:-0.1em"></i> Rp 15.000 / Minggu</span>
+            <span class="price-tag"><i data-lucide="flame" class="lucide" style="width:14px;height:14px;vertical-align:-0.1em;color:#ea580c"></i> Rp 50.000 / Bulan</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CROSS-PROMOTION BANNER -->
+    <section class="section-padding reveal" style="background:var(--slate-50)">
+      <div class="promo-banner">
+        <i data-lucide="sparkles" class="lucide" style="width:24px;height:24px;color:#a67c30;flex-shrink:0"></i>
+        <div class="promo-text">
+          <strong>NotaOTO Pro</strong> (Versi Lengkap dengan Fitur Stok &amp; Laporan Keuangan) sedang dikembangkan oleh tim kami. <strong>Pantau terus!</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="padding:28px 20px;text-align:center;background:var(--slate-900);color:var(--slate-400)">
+      <p style="font-size:0.78rem;font-family:var(--font-display);font-style:italic;margin-bottom:12px">
+        © 2024 - NotaOTO LITE • Solusi Nota Digital untuk UMKM Indonesia
+      </p>
+      <div class="footer-links">
+        <a href="#" class="footer-link" id="tos-link">Terms of Service</a>
+        <span class="footer-sep">|</span>
+        <a href="#" class="footer-link" id="privacy-link">Privacy Usage</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============================================
+       PAGE: DASHBOARD PREMIUM
+       ============================================ -->
+  <div id="dashboard-page" class="page">
+
+    <!-- HEADER -->
+    <header class="dashboard-header">
+      <div class="dashboard-header-content">
+        <div class="dashboard-logo"><i data-lucide="scroll-text" class="lucide" style="width:22px;height:22px;color:var(--emerald-500);vertical-align:-0.2em"></i> <span id="store-name-display">NotaOTO LITE</span></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="expiry-badge" class="expiry-badge">
+            <i data-lucide="clock" class="lucide" style="width:12px;height:12px;color:#ecd8a4"></i>
+            <span><span class="expiry-label">Aktif hingga: </span><strong id="expiry-date">-</strong></span>
+          </div>
+          <button id="logout-btn" class="logout-btn" title="Keluar">
+            <i data-lucide="log-out" class="lucide" style="width:14px;height:14px"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+      <!-- ===== LEFT COLUMN: FORM ===== -->
+      <div class="form-section">
+
+        <!-- Store Info Card -->
+        <div class="form-card">
+          <div class="form-card-title">
+<i data-lucide="store" class="lucide" style="width:16px;height:16px;color:var(--primary)"></i> Profil Toko
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label class="form-label">Nama Toko</label>
+            <input type="text" id="store-name" class="form-input" placeholder="Nama toko Anda..." maxlength="50">
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label class="form-label">Nomor WhatsApp Toko</label>
+            <input type="tel" id="store-wa" class="form-input" placeholder="628386806386" maxlength="20">
+            <div style="font-size:0.68rem;color:var(--slate-400);margin-top:4px">Gunakan format internasional, contoh: 628386806386</div>
+          </div>
+
+          <div>
+            <label class="form-label">QRIS Pembayaran</label>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <div class="qris-upload">
+                <input type="file" id="qris-upload" accept="image/*">
+                <div id="qris-placeholder" class="qris-placeholder">
+                  <span style="font-size:1.2rem">+</span>
+                  <span>Upload QRIS</span>
+                </div>
+                <img id="qris-preview" class="qris-preview" style="display:none" alt="QRIS Toko">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-size:0.72rem;color:var(--slate-400)">
+                  Upload foto QRIS agar pelanggan bisa bayar langsung dari nota. Max 500KB.
+                </span>
+                <button id="qris-delete" class="btn-delete-qris" style="display:none" title="Hapus QRIS">
+                  <i data-lucide="trash-2" class="lucide" style="width:14px;height:14px"></i> Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Card -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <i data-lucide="user" class="lucide" style="width:16px;height:16px;color:var(--primary)"></i> Pelanggan
+          </div>
+          <div>
+            <label class="form-label">Nama Pelanggan</label>
+            <input type="text" id="customer-name" class="form-input" placeholder="Masukkan nama pelanggan..." maxlength="50">
+          </div>
+        </div>
+
+        <!-- Items Card -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <i data-lucide="package" class="lucide" style="width:16px;height:16px;color:var(--primary)"></i> Daftar Belanja
+            <span id="total-items" style="margin-left:auto;font-size:0.9rem;color:var(--primary);font-weight:700">Rp 0</span>
+          </div>
+
+          <div id="items-container">
+            <!-- Dynamic items rendered by JS -->
+          </div>
+
+          <div id="empty-items" class="empty-state">
+<i data-lucide="shopping-cart" class="lucide" style="width:36px;height:36px;color:var(--slate-300);display:block;margin:0 auto 12px"></i>
+            <p>Belum ada barang. Tambah item pertama!</p>
+          </div>
+
+          <button id="add-item-btn" class="btn-secondary btn-block" style="margin-top:8px">
+            <i data-lucide="plus" class="lucide" style="width:16px;height:16px"></i> Tambah Barang
+          </button>
+        </div>
+
+        <!-- Visual Controller Card -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <span class="icon"><i data-lucide="palette" class="lucide" style="width:16px;height:16px;color:var(--primary)"></i></span> Visual Controller
+          </div>
+
+          <!-- Layout Selector -->
+          <div style="margin-bottom:16px">
+            <label class="form-label">Tampilan Nota</label>
+            <div class="layout-selector">
+              <button class="layout-option active" data-layout="minimalis">
+                <i data-lucide="file-text" class="lucide layout-icon" style="width:22px;height:22px;color:var(--primary)"></i>
+                Minimalis
+              </button>
+              <button class="layout-option" data-layout="struk">
+                <i data-lucide="receipt" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Struk Kasir
+              </button>
+              <button class="layout-option" data-layout="olshop">
+                <i data-lucide="sparkles" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Olshop Estetik
+              </button>
+              <button class="layout-option" data-layout="elegan">
+                <i data-lucide="gem" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Elegan Emas
+              </button>
+              <button class="layout-option" data-layout="klasik">
+                <i data-lucide="book-open" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Klasik Toko
+              </button>
+              <button class="layout-option" data-layout="kartu">
+                <i data-lucide="layout-panel-top" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Kartu Modern
+              </button>
+              <button class="layout-option" data-layout="boho">
+                <i data-lucide="flower-2" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Boho Pastel
+              </button>
+              <button class="layout-option" data-layout="korporat">
+                <i data-lucide="briefcase" class="lucide layout-icon" style="width:22px;height:22px;color:var(--slate-400)"></i>
+                Korporat
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Picker -->
+          <div>
+            <label class="form-label">Warna Tema</label>
+            <div class="color-picker">
+              <div class="color-circle active" data-color="#0e7a54" style="background:#0e7a54" title="Emerald"></div>
+              <div class="color-circle" data-color="#2563eb" style="background:#2563eb" title="Royal Blue"></div>
+              <div class="color-circle" data-color="#7c3aed" style="background:#7c3aed" title="Violet"></div>
+              <div class="color-circle" data-color="#dc2626" style="background:#dc2626" title="Ruby Red"></div>
+              <div class="color-circle" data-color="#b45309" style="background:#b45309" title="Amber Gold"></div>
+              <div class="color-circle" data-color="#e11d48" style="background:#e11d48" title="Rose Pink"></div>
+              <div class="color-circle" data-color="#0d9488" style="background:#0d9488" title="Teal"></div>
+              <div class="color-circle" data-color="#4338ca" style="background:#4338ca" title="Indigo Navy"></div>
+              <div class="color-circle" data-color="#ea580c" style="background:#ea580c" title="Burnt Orange"></div>
+              <div class="color-circle" data-color="#78350f" style="background:#78350f" title="Chocolate Brown"></div>
+              <div class="color-circle" data-color="#d97706" style="background:linear-gradient(135deg,#dc2626 0%,#f59e0b 55%,#16a34a 100%)" title="Tropical Sunrise (Merah-Kuning-Hijau)"></div>
+              <div class="color-circle" data-color="#7f1d1d" style="background:linear-gradient(135deg,#0f0f0f 0%,#7f1d1d 55%,#b91c1c 100%)" title="Crimson Noir (Merah-Hitam)"></div>
+              <div class="color-circle" data-color="#c026d3" style="background:linear-gradient(135deg,#f97316 0%,#db2777 55%,#7c3aed 100%)" title="Sunset Berry (Oranye-Pink-Ungu)"></div>
+              <div class="color-circle" data-color="#0e6ba8" style="background:linear-gradient(135deg,#1e3a8a 0%,#0891b2 55%,#059669 100%)" title="Ocean Depth (Navy-Teal-Emerald)"></div>
+              <div class="color-circle" data-color="#86198f" style="background:linear-gradient(135deg,#4c1d95 0%,#86198f 50%,#be185d 100%)" title="Royal Velvet (Ungu Tua-Magenta)"></div>
+              <div class="color-circle" data-color="#9a3412" style="background:linear-gradient(135deg,#7c2d12 0%,#b45309 55%,#d97706 100%)" title="Golden Ember (Coklat-Emas-Oranye)"></div>
+              <div class="color-circle" data-color="#3f6212" style="background:linear-gradient(135deg,#14532d 0%,#ca8a04 100%)" title="Emerald Gold (Hijau Tua-Emas)"></div>
+              <div class="color-circle" data-color="#9d174d" style="background:linear-gradient(135deg,#9f1239 0%,#d4af37 100%)" title="Rose Gold (Merah Marun-Emas)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Generate (bukan floating) -->
+        <button id="generate-btn" class="btn-primary btn-generate">
+          <span id="generate-spinner" class="spinner" style="display:none"></span>
+          <i data-lucide="send" class="lucide" style="width:18px;height:18px" id="generate-icon"></i>
+          <span id="generate-text">Generate &amp; Kirim ke WhatsApp</span>
+        </button>
+
+        <!-- WA Preview (hasil generate muncul di sini) -->
+        <div id="wa-preview" class="wa-preview">
+          <!-- Konten di-generate oleh handleGenerate() -->
+        </div>
+
+      </div>
+
+      <!-- ===== RIGHT COLUMN: PREVIEW & ACTIONS ===== -->
+      <div class="preview-section">
+
+        <!-- Live Preview -->
+        <div class="preview-container">
+          <div class="preview-header">
+            <span><i data-lucide="eye" class="lucide" style="width:14px;height:14px;vertical-align:-0.1em"></i> Live Preview Nota</span>
+            <span class="preview-badge">Real-time</span>
+          </div>
+          <div id="invoice-preview">
+            <!-- Rendered by JS -->
+            <div class="empty-state">
+              <i data-lucide="file-pen-line" class="lucide" style="width:36px;height:36px;color:var(--slate-300);display:block;margin:0 auto 12px"></i>
+              <p>Isi data toko dan barang untuk melihat preview nota</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ============================================
+       MODAL: TERMS OF SERVICE
+       ============================================ -->
+  <div id="tos-modal" class="legal-modal-overlay">
+    <div class="legal-modal-box">
+      <button class="legal-modal-close" id="tos-close">&times;</button>
+      <h3 class="legal-modal-title">Terms of Service</h3>
+      <div class="legal-modal-body">
+        <p><strong>1. Penerimaan Ketentuan</strong><br>
+        Dengan menggunakan NotaOTO LITE ("Layanan"), Anda menyetujui Terms of Service ini. Jika tidak setuju, jangan gunakan layanan ini.</p>
+
+        <p><strong>2. Deskripsi Layanan</strong><br>
+        NotaOTO LITE adalah aplikasi web untuk membuat nota digital premium dan mengirimkannya melalui WhatsApp. Semua data diproses dan disimpan di perangkat Anda (localStorage) - tidak ada database server yang menyimpan data transaksi Anda.</p>
+
+        <p><strong>3. Kode Akses Premium</strong><br>
+        Akses fitur premium memerlukan kode akses yang dibeli secara terpisah. Kode akses bersifat pribadi, tidak dapat dialihkan, dan memiliki masa berlaku sesuai paket yang dibeli. Penyalahgunaan kode akses (termasuk distribusi tanpa izin) dapat mengakibatkan pencabutan akses tanpa pengembalian dana.</p>
+
+        <p><strong>4. Tanggung Jawab Pengguna</strong><br>
+        Anda bertanggung jawab penuh atas data yang dimasukkan (nama toko, harga barang, data pelanggan). NotaOTO LITE hanyalah alat bantu - kami tidak menyimpan, membagikan, atau memproses data tersebut di server kami.</p>
+
+        <p><strong>5. Pembayaran & Pengembalian Dana</strong><br>
+        Pembayaran dilakukan di luar platform (via admin). Pengembalian dana dipertimbangkan secara kasus per kasus dalam 7 hari sejak pembelian jika kode akses belum pernah digunakan.</p>
+
+        <p><strong>6. Batasan Tanggung Jawab</strong><br>
+        NotaOTO LITE disediakan "sebagaimana adanya". Kami tidak bertanggung jawab atas kerugian langsung atau tidak langsung akibat penggunaan atau ketidakmampuan menggunakan layanan ini, termasuk namun tidak terbatas pada kehilangan data lokal, kesalahan input pengguna, atau gangguan layanan dari pihak ketiga (WhatsApp, CDN, Google Fonts, dll).</p>
+
+        <p><strong>7. Perubahan Layanan</strong><br>
+        Kami berhak mengubah, menangguhkan, atau menghentikan layanan kapan saja dengan pemberitahuan melalui halaman ini. Harga dan paket dapat berubah sewaktu-waktu.</p>
+
+        <p><strong>8. Hukum yang Berlaku</strong><br>
+        Ketentuan ini diatur oleh hukum Republik Indonesia. Setiap sengketa akan diselesaikan melalui musyawarah terlebih dahulu.</p>
+
+        <p style="color:var(--slate-400);font-size:0.75rem;margin-top:16px">Terakhir diperbarui: 13 Juli 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL: PRIVACY USAGE
+       ============================================ -->
+  <div id="privacy-modal" class="legal-modal-overlay">
+    <div class="legal-modal-box">
+      <button class="legal-modal-close" id="privacy-close">&times;</button>
+      <h3 class="legal-modal-title">Privacy Usage</h3>
+      <div class="legal-modal-body">
+        <p><strong>1. Data yang Kami Kumpulkan</strong><br>
+        NotaOTO LITE menyimpan data berikut di <strong>perangkat Anda sendiri</strong> (localStorage browser):<br>
+        • Nama toko dan nomor WhatsApp toko<br>
+        • Nama pelanggan dan daftar belanja<br>
+        • Foto QRIS pembayaran (jika diunggah)<br>
+        • Kode akses premium & masa berlaku<br>
+        • Preferensi tema dan layout nota</p>
+
+        <p><strong>2. Kami Tidak Mengumpulkan</strong><br>
+        • Data pribadi pengguna yang dapat diidentifikasi (nama, alamat, email)<br>
+        • Riwayat transaksi penjualan<br>
+        • Lokasi geografis<br>
+        • Data kontak pelanggan dari buku alamat<br>
+        • Informasi pembayaran atau kartu kredit<br>
+        • Cookie pelacakan iklan</p>
+
+        <p><strong>3. Penyimpanan Data</strong><br>
+        Seluruh data nota disimpan secara lokal di browser Anda menggunakan <strong>localStorage</strong>. Tidak ada data transaksi yang dikirim, disimpan, atau diproses di server kami. Data akan hilang jika Anda menghapus cache browser atau menggunakan perangkat/ganti browser lain.</p>
+
+        <p><strong>4. Data Verifikasi</strong><br>
+        Saat aktivasi kode premium, kode akses dikirim ke server verifikasi (Google Apps Script) untuk validasi. Server hanya menerima kode akses - tidak ada data toko, pelanggan, atau barang yang dikirimkan.</p>
+
+        <p><strong>5. Layanan Pihak Ketiga</strong><br>
+        Aplikasi ini menggunakan layanan pihak ketiga:<br>
+        • <strong>Google Apps Script</strong> - verifikasi kode akses<br>
+        • <strong>WhatsApp Web</strong> - pengiriman nota (atas tindakan pengguna)<br>
+        • <strong>Google Fonts & CDN jsDelivr</strong> - muat font & library<br>
+        • <strong>Lucide Icons</strong> - ikon SVG<br>
+        Masing-masing pihak ketiga memiliki kebijakan privasi sendiri.</p>
+
+        <p><strong>6. Keamanan</strong><br>
+        Karena data disimpan di perangkat Anda, keamanan data bergantung pada keamanan perangkat dan browser Anda. Kami merekomendasikan untuk tidak menggunakan aplikasi ini di perangkat publik/shared.</p>
+
+        <p><strong>7. Hak Anda</strong><br>
+        Anda dapat menghapus seluruh data kapan saja dengan membersihkan localStorage browser (Settings → Privacy → Clear Data) atau melalui fitur Logout yang menghapus sesi premium.</p>
+
+        <p><strong>8. Perubahan Kebijakan</strong><br>
+        Setiap perubahan pada kebijakan privasi akan diumumkan di halaman ini. Dengan terus menggunakan layanan setelah perubahan, Anda menyetujui kebijakan yang diperbarui.</p>
+
+        <p><strong>9. Kontak</strong><br>
+        Untuk pertanyaan lebih lanjut, hubungi admin melalui WhatsApp yang tersedia di halaman aktivasi.</p>
+
+        <p style="color:var(--slate-400);font-size:0.75rem;margin-top:16px">Terakhir diperbarui: 13 Juli 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MAIN APP SCRIPT
+       ============================================ -->
+  <script src="app.js"></script>
+  <script>
+    // ToS & Privacy Modal handlers (terpisah dari app.js agar tidak campur aduk)
+    document.addEventListener('DOMContentLoaded', function() {
+      // ToS
+      var tosLink = document.getElementById('tos-link');
+      var tosModal = document.getElementById('tos-modal');
+      var tosClose = document.getElementById('tos-close');
+      tosLink.addEventListener('click', function(e) { e.preventDefault(); tosModal.classList.add('active'); });
+      tosClose.addEventListener('click', function() { tosModal.classList.remove('active'); });
+      tosModal.addEventListener('click', function(e) { if (e.target === tosModal) tosModal.classList.remove('active'); });
+
+      // Privacy
+      var privLink = document.getElementById('privacy-link');
+      var privModal = document.getElementById('privacy-modal');
+      var privClose = document.getElementById('privacy-close');
+      privLink.addEventListener('click', function(e) { e.preventDefault(); privModal.classList.add('active'); });
+      privClose.addEventListener('click', function() { privModal.classList.remove('active'); });
+      privModal.addEventListener('click', function(e) { if (e.target === privModal) privModal.classList.remove('active'); });
+    });
+  </script>
+</body>
+</html>
