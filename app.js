@@ -17,7 +17,9 @@ const CONFIG = {
   // Set ke false dan isi GAS_URL untuk mode production
   DEMO_MODE: false,
 
-  // Kode demo untuk testing (hanya berlaku jika DEMO_MODE = true)
+  // Akun & kode demo untuk testing (hanya berlaku jika DEMO_MODE = true)
+  // Keduanya harus diisi bersamaan supaya lolos verifikasi demo.
+  DEMO_ACCOUNT: 'AK-DEMO01',
   DEMO_CODE: 'NK-DEMO01',
 
   // Waktu expired demo (7 hari dari sekarang)
@@ -86,6 +88,7 @@ const CONFIG = {
 
   // Storage keys
   STORAGE_KEYS: {
+    ACCOUNT: 'notaoto_account',
     CODE: 'notaoto_code',
     EXPIRES: 'notaoto_expires',
     PROFILE: 'notaoto_profile',
@@ -101,6 +104,7 @@ const CONFIG = {
 // ============================================
 const state = {
   isPremium: false,
+  account: '',
   code: '',
   expires: '',
   profile: { ...CONFIG.DEFAULT_PROFILE },
@@ -126,6 +130,7 @@ function cacheDOM() {
 
   // Landing
   dom.activationForm = $('#activation-form');
+  dom.accountInput = $('#account-input');
   dom.codeInput = $('#code-input');
   dom.verifyBtn = $('#verify-btn');
   dom.verifySpinner = $('#verify-spinner');
@@ -272,6 +277,7 @@ function parseRupiah(str) {
 // ============================================
 function saveToStorage() {
   try {
+    localStorage.setItem(CONFIG.STORAGE_KEYS.ACCOUNT, state.account);
     localStorage.setItem(CONFIG.STORAGE_KEYS.CODE, state.code);
     localStorage.setItem(CONFIG.STORAGE_KEYS.EXPIRES, state.expires);
     localStorage.setItem(CONFIG.STORAGE_KEYS.PROFILE, JSON.stringify(state.profile));
@@ -286,6 +292,7 @@ function saveToStorage() {
 
 function loadFromStorage() {
   try {
+    const account = localStorage.getItem(CONFIG.STORAGE_KEYS.ACCOUNT);
     const code = localStorage.getItem(CONFIG.STORAGE_KEYS.CODE);
     const expires = localStorage.getItem(CONFIG.STORAGE_KEYS.EXPIRES);
     const profile = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PROFILE) || 'null');
@@ -294,6 +301,7 @@ function loadFromStorage() {
     const items = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ITEMS) || '[]');
     const customer = localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOMER) || '';
 
+    if (account) state.account = account;
     if (code) state.code = code;
     if (expires) state.expires = expires;
     if (profile) state.profile = { ...CONFIG.DEFAULT_PROFILE, ...profile };
@@ -325,6 +333,7 @@ function isExpired(dateStr) {
 
 function clearSession() {
   state.isPremium = false;
+  state.account = '';
   state.code = '';
   state.expires = '';
   Object.keys(CONFIG.STORAGE_KEYS).forEach(k => {
@@ -375,38 +384,42 @@ function showPage(pageId) {
 // ============================================
 // VERIFIKASI KODE AKSES
 // ============================================
-async function verifyCode(code) {
+// Akun & kode SELALU diverifikasi berpasangan. Akun adalah kunci utama —
+// kode tanpa akun yang benar (atau sebaliknya) tidak akan pernah dianggap valid.
+async function verifyCode(account, code) {
   if (CONFIG.DEMO_MODE) {
-    return verifyCodeDemo(code);
+    return verifyCodeDemo(account, code);
   }
-  return verifyCodeGAS(code);
+  return verifyCodeGAS(account, code);
 }
 
-function verifyCodeDemo(code) {
+function verifyCodeDemo(account, code) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const normalized = code.toUpperCase().trim();
+      const normalizedAccount = (account || '').toUpperCase().trim();
+      const normalizedCode = (code || '').toUpperCase().trim();
 
-      if (normalized === CONFIG.DEMO_CODE) {
+      if (normalizedAccount === CONFIG.DEMO_ACCOUNT && normalizedCode === CONFIG.DEMO_CODE) {
         resolve({
           valid: true,
           name: 'Toko Demo',
           expires: CONFIG.DEMO_EXPIRY,
           status: 'AKTIF',
           wa: '08123456789',
-          code: normalized
+          account: normalizedAccount,
+          code: normalizedCode
         });
       } else {
         resolve({
           valid: false,
-          message: 'Kode akses tidak valid. Coba: NK-DEMO01'
+          message: 'Akun/kode akses tidak valid. Coba: AK-DEMO01 / NK-DEMO01'
         });
       }
     }, 1200); // Simulasi delay network
   });
 }
 
-async function verifyCodeGAS(code) {
+async function verifyCodeGAS(account, code) {
   if (!CONFIG.GAS_URL) {
     return { valid: false, message: 'URL Google Apps Script belum dikonfigurasi.' };
   }
@@ -419,7 +432,8 @@ async function verifyCodeGAS(code) {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
-        code: code.toUpperCase().trim(),
+        account: (account || '').toUpperCase().trim(),
+        code: (code || '').toUpperCase().trim(),
         action: 'verify'
       })
     });
@@ -1067,7 +1081,7 @@ async function handleGenerate() {
   // dulu pas online, lalu diam-diam offline-kan device buat pakai kode
   // tanpa batas tanpa pernah dicek server lagi.
   try {
-    const cekOnline = await verifyCode(state.code);
+    const cekOnline = await verifyCode(state.account, state.code);
 
     if (!cekOnline || !cekOnline.valid) {
       if (cekOnline && cekOnline.networkError) {
@@ -1079,8 +1093,8 @@ async function handleGenerate() {
         showToast(cekOnline?.message || 'Kode akses Anda sudah tidak valid.', 'error');
         state.isPremium = false;
         clearSession();
-        showPage('landing-page');
-        showActivationStatus();
+        // Reload paksa biar semua hack di console/source hilang total
+        location.reload();
       }
       resetTombolGenerate();
       return;
@@ -1301,8 +1315,8 @@ function bindEvents() {
     );
     if (result) {
       clearSession();
-      showPage('landing-page');
-      showToast('Berhasil logout', 'info');
+      // Reload paksa biar semua hack di console/source hilang total
+      location.reload();
     }
   });
 
@@ -1313,7 +1327,13 @@ function bindEvents() {
     window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
   });
 
-  // ---- Enter key on code input ----
+  // ---- Enter key on account & code input ----
+  dom.accountInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      dom.verifyBtn.click();
+    }
+  });
   dom.codeInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -1341,10 +1361,11 @@ function bindEvents() {
 // HANDLE ACTIVATION
 // ============================================
 async function handleActivation() {
+  const account = dom.accountInput.value.trim();
   const code = dom.codeInput.value.trim();
 
-  if (!code) {
-    dom.activationError.textContent = 'Silakan masukkan kode akses premium';
+  if (!account || !code) {
+    dom.activationError.textContent = 'Silakan masukkan akun dan kode akses premium';
     dom.activationError.style.display = 'block';
     return;
   }
@@ -1356,11 +1377,12 @@ async function handleActivation() {
   dom.activationError.style.display = 'none';
 
   try {
-    const result = await verifyCode(code);
+    const result = await verifyCode(account, code);
 
     if (result.valid) {
-      // Sukses!
+      // Sukses! Akun & kode cocok dan lolos verifikasi ketat server.
       state.isPremium = true;
+      state.account = result.account || account.toUpperCase();
       state.code = result.code || code.toUpperCase();
       state.expires = result.expires;
 
@@ -1376,19 +1398,19 @@ async function handleActivation() {
       showActivationStatus();
     } else {
       // Gagal
-      dom.activationError.textContent = result.message || 'Kode akses tidak valid';
+      dom.activationError.textContent = result.message || 'Akun/kode akses tidak valid';
       dom.activationError.style.display = 'block';
-      showToast(result.message || 'Kode akses tidak valid', 'error');
+      showToast(result.message || 'Akun/kode akses tidak valid', 'error');
     }
   } catch (error) {
     console.error('Activation error:', error);
     dom.activationError.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
     dom.activationError.style.display = 'block';
-    showToast('Gagal memverifikasi kode', 'error');
+    showToast('Gagal memverifikasi akun & kode', 'error');
   } finally {
     dom.verifyBtn.disabled = false;
     dom.verifySpinner.style.display = 'none';
-    dom.verifyText.textContent = '🔓 Aktifkan Premium';
+    dom.verifyText.textContent = '🔓 Aktifasi Akun & Kode';
   }
 }
 
@@ -1465,10 +1487,10 @@ function formatDateDisplay(dateStr) {
  * lagi, pengecekan berikutnya otomatis meluruskan status yang sebenarnya.
  */
 async function revalidateSession() {
-  if (!state.code) return;
+  if (!state.account || !state.code) return;
 
   try {
-    const result = await verifyCode(state.code);
+    const result = await verifyCode(state.account, state.code);
 
     if (result && result.valid) {
       // Server jadi sumber kebenaran: timpa expires lokal dengan punya server,
@@ -1481,15 +1503,76 @@ async function revalidateSession() {
       // paksa keluar walau localStorage lokal masih bilang "aktif".
       state.isPremium = false;
       clearSession();
-      showPage('landing-page');
-      showActivationStatus();
       showToast(result?.message || 'Masa aktif Anda telah berakhir. Silakan aktivasi ulang.', 'info');
+      // Reload biar bersih total
+      location.reload();
     }
   } catch (e) {
     // Kemungkinan besar offline — jangan kunci akses, cukup catat di console.
     console.warn('Revalidasi sesi gagal (mungkin sedang offline):', e);
   }
 }
+
+// ============================================
+// ANTI-TAMPER WATCHDOG + INTEGRITY CHECK
+// ============================================
+// Melindungi dari 2 jenis hacking lewat F12:
+//   1. Console: ubah state premium → restore tiap 2 detik
+//   2. Sources: edit fungsi kritis (verifyCode, handleGenerate) → auto-reload
+// Dua-duanya bikin hacking sia-sia karena cuma bertahan beberapa detik.
+(function initWatchdog() {
+  // --- Sidik jari fungsi kritis (untuk deteksi edit di tab Sources) ---
+  // Simpan 200 karakter pertama dari source code asli fungsi-fungsi ini.
+  // Kalau user edit di Sources tab, toString() otomatis beda → ketahuan.
+  const _origVerify = (verifyCode || '').toString().substring(0, 200);
+  const _origHandle = (handleGenerate || '').toString().substring(0, 200);
+
+  function restorePremium() {
+    const acc = localStorage.getItem(CONFIG.STORAGE_KEYS.ACCOUNT) || '';
+    const cod = localStorage.getItem(CONFIG.STORAGE_KEYS.CODE) || '';
+    const exp = localStorage.getItem(CONFIG.STORAGE_KEYS.EXPIRES) || '';
+    const valid = !!(acc && cod && exp && !isExpired(exp));
+    if (state.account !== acc || state.code !== cod || state.expires !== exp || state.isPremium !== valid) {
+      state.account = acc;
+      state.code = cod;
+      state.expires = exp;
+      state.isPremium = valid;
+    }
+  }
+
+  function checkIntegrity() {
+    // Cek apakah fungsi kritis masih asli (gak diedit lewat Sources/console)
+    const vNow = (verifyCode || '').toString().substring(0, 200);
+    const hNow = (handleGenerate || '').toString().substring(0, 200);
+    return vNow === _origVerify && hNow === _origHandle;
+  }
+
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+
+    // Cek integrity dulu — kalau fungsi diedit, reload paksa
+    if (!checkIntegrity()) {
+      location.reload();
+      return;
+    }
+
+    // Restore state premium
+    restorePremium();
+  }, 2000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (!checkIntegrity()) location.reload();
+      else restorePremium();
+    }
+  });
+
+  // Proteksi tambahan: disable context menu di console (bikin repot user iseng)
+  // Hanya jalan di landing page, bukan dashboard
+  document.addEventListener('contextmenu', (e) => {
+    // Biarkan context menu normal — terlalu agresif kalau diblokir total
+  });
+})();
 
 // ============================================
 // INITIALIZATION
@@ -1509,7 +1592,7 @@ function init() {
   // Cek session tersimpan
   const saved = loadFromStorage();
 
-  if (saved === true && state.code && state.expires && !isExpired(state.expires)) {
+  if (saved === true && state.account && state.code && state.expires && !isExpired(state.expires)) {
     // Session masih valid (secara lokal) — langsung masuk dashboard dulu biar
     // UX cepat & tetap bisa dipakai offline buat edit-edit ringan (nama toko,
     // barang, dll), LALU cek ulang ke server di belakang layar. Verifikasi
@@ -1539,6 +1622,7 @@ function init() {
 
   // Set demo hint
   if (CONFIG.DEMO_MODE) {
+    dom.accountInput.placeholder = 'Masukkan akun (demo: AK-DEMO01)';
     dom.codeInput.placeholder = 'Masukkan kode akses (demo: NK-DEMO01)';
   }
 
@@ -1553,11 +1637,11 @@ document.addEventListener('DOMContentLoaded', init);
 // balik ke tab ini (misal habis buka WhatsApp lalu balik lagi). Interval
 // dijaga tidak terlalu sering supaya tidak boros kuota Google Apps Script.
 setInterval(() => {
-  if (state.isPremium && state.code) revalidateSession();
+  if (state.isPremium && state.account && state.code) revalidateSession();
 }, 60 * 60 * 1000);
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && state.isPremium && state.code) {
+  if (document.visibilityState === 'visible' && state.isPremium && state.account && state.code) {
     revalidateSession();
   }
 });
@@ -1589,5 +1673,97 @@ document.addEventListener('visibilitychange', () => {
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
 
     revealEls.forEach(el => observer.observe(el));
+  });
+})();
+
+// ============================================
+// PWA: REGISTER SERVICE WORKER + TOMBOL INSTALL
+// ============================================
+// Ini yang bikin web NotaOTO LITE bisa di-"Install" jadi app di HP
+// (muncul ikon di homescreen kayak app biasa, buka tanpa address bar
+// browser). Bukan file .apk asli, tapi hasil & pengalamannya di HP
+// user mirip banget — cara paling ringan & tanpa perlu upload ke Play
+// Store. Kalau nanti butuh .apk sungguhan buat di-submit ke Play Store,
+// itu langkah terpisah (pakai TWA/Bubblewrap) di atas fondasi PWA ini.
+(function initPWA() {
+  // Daftarkan service worker (syarat wajib PWA supaya "installable")
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch((err) => {
+        console.warn('Service worker gagal didaftarkan:', err);
+      });
+    });
+  }
+
+  let installPromptEvent = null;
+  let installBtn = null;
+  let pwaDismissed = false; // flag memory — hilang kalau refresh/buka tab baru
+
+  function buatTombolInstall() {
+    if (installBtn) return installBtn;
+    installBtn = document.createElement('div');
+    installBtn.id = 'pwa-install-btn';
+    installBtn.className = 'pwa-install-btn';
+    installBtn.innerHTML =
+      '<div class="pwa-install-inner">' +
+        '<div class="pwa-install-icon-wrap">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+            '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>' +
+            '<line x1="12" y1="18" x2="12.01" y2="18"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="pwa-install-info">' +
+          '<strong class="pwa-install-title">Install NotaOTO LITE</strong>' +
+          '<span class="pwa-install-desc">Akses cepat dari layar utama HP</span>' +
+        '</div>' +
+        '<button class="pwa-install-action">Install</button>' +
+        '<button class="pwa-install-close" aria-label="Tutup">&times;</button>' +
+      '</div>';
+    document.body.appendChild(installBtn);
+
+    // Install action
+    installBtn.querySelector('.pwa-install-action').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!installPromptEvent) return;
+      installPromptEvent.prompt();
+      const { outcome } = await installPromptEvent.userChoice;
+      installPromptEvent = null;
+      sembunyikanBannerInstall();
+      if (outcome === 'accepted' && typeof showToast === 'function') {
+        showToast('✅ NotaOTO LITE berhasil di-install!', 'success');
+      }
+    });
+
+    // Close / dismiss — flag memory aja, begitu refresh/buka tab baru muncul lagi
+    installBtn.querySelector('.pwa-install-close').addEventListener('click', (e) => {
+      e.stopPropagation();
+      pwaDismissed = true;
+      sembunyikanBannerInstall();
+    });
+    return installBtn;
+  }
+
+  function sembunyikanBannerInstall() {
+    if (installBtn) installBtn.classList.remove('show');
+    document.body.classList.remove('pwa-banner-visible');
+  }
+
+  // Chrome/Android akan fire event ini kalau web-nya memenuhi syarat PWA
+  // (ada manifest + service worker + HTTPS). Safari/iOS tidak fire event
+  // ini — di iOS, install tetap bisa manual lewat Share > Add to Home Screen.
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    // Skip kalau sudah di-dismiss di sesi ini
+    if (pwaDismissed || state.isPremium) return;
+    installPromptEvent = e;
+    buatTombolInstall().classList.add('show');
+    document.body.classList.add('pwa-banner-visible');
+  });
+
+  // Kalau sudah ke-install, sembunyikan tombolnya.
+  window.addEventListener('appinstalled', () => {
+    installPromptEvent = null;
+    pwaDismissed = true;
+    sembunyikanBannerInstall();
   });
 })();

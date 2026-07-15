@@ -29,7 +29,8 @@
 
   <title>NotaOTO LITE - Nota Digital Premium untuk UMKM</title>
 
-  <!-- PWA / Offline hint -->
+  <!-- PWA Manifest & Install -->
+  <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230e7a54'/%3E%3Cpath d='M35 55l10 10 20-20' fill='none' stroke='%23ecd8a4' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
   <style>
@@ -266,7 +267,7 @@
       <h2 class="section-title">Mulai Sekarang</h2>
       <div class="section-divider"></div>
       <p class="section-subtitle">
-        Masukkan kode akses premium yang sudah dibeli untuk mengaktifkan fitur lengkap.
+        Masukkan akun & kode akses premium yang sudah dibeli untuk mengaktifkan fitur lengkap.
       </p>
 
       <div class="activation-box" style="position:relative">
@@ -274,9 +275,20 @@
         <!-- FORM AKTIVASI -->
         <div id="activation-form-wrapper">
           <h3><i data-lucide="key" class="lucide" style="width:20px;height:20px;color:var(--amber-500);vertical-align:-0.15em"></i> Aktivasi Premium</h3>
-          <p>Masukkan kode akses yang Anda dapatkan dari admin</p>
+          <p>Masukkan akun dan kode akses yang Anda dapatkan dari admin</p>
 
           <form id="activation-form">
+            <div class="code-input-group">
+              <input
+                type="text"
+                id="account-input"
+                class="form-input"
+                placeholder="Masukkan akun"
+                autocomplete="off"
+                maxlength="20"
+                style="text-transform:uppercase"
+              >
+            </div>
             <div class="code-input-group">
               <input
                 type="text"
@@ -294,7 +306,7 @@
             <button type="submit" id="verify-btn" class="btn-primary btn-block btn-generate">
               <span id="verify-spinner" class="spinner" style="display:none"></span>
               <i data-lucide="unlock" class="lucide" style="width:16px;height:16px;display:none" id="verify-icon"></i>
-              <span id="verify-text">Aktifkan Premium</span>
+              <span id="verify-text">Aktifasi Akun & Kode</span>
             </button>
           </form>
         </div>
