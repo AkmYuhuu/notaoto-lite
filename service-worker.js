@@ -13,7 +13,7 @@
 // Naikkan angka versi ini (cache_v1 -> cache_v2, dst) setiap kali
 // habis update file app.js/style.css/index.html, supaya HP pengguna
 // otomatis ambil versi baru dan bukan versi cache lama.
-const CACHE_NAME = 'notaoto-lite-cache-v1';
+const CACHE_NAME = 'notaoto-lite-cache-v2';
 
 const FILE_YANG_DICACHE = [
   './',
@@ -21,8 +21,8 @@ const FILE_YANG_DICACHE = [
   './style.css',
   './app.js',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './favicon-192x192.png',
+  './favicon-512x512.png'
 ];
 
 // Saat pertama kali diinstal: simpan semua file inti ke cache.
